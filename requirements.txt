@@ -1,0 +1,12 @@
+torch
+torchvision
+timm
+transformers
+fastapi
+uvicorn
+streamlit
+gradio
+pillow
+numpy
+captum
+datasets

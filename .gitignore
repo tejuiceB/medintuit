@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.pkl
+*.pth
+.env
+models/
+data/
+venv/
+notebooks/chest-xray-pneumonia.zip
