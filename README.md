@@ -1,196 +1,185 @@
-# MediScan: AI-Powered Web App for Medical Image Diagnosis
+# MediScan: AI-Powered Chest X-ray Diagnosis
 
-MediScan is a full-stack AI application that enables users to upload chest X-ray images and receive:
-- Disease classification using Vision Transformers (ViT)
-- Explainable heatmaps (Captum)
-- Natural language diagnostic reports (LLM)
+MediScan is a full-stack AI application for automated chest X-ray analysis. It leverages a fine-tuned Vision Transformer (ViT) model to classify images as **NORMAL** or **PNEUMONIA** and provides explainable, human-readable observations for each prediction.
 
 ---
 
-## 🚀 Project Setup
+## 🚀 Features
 
-### 1. Create the Folder Structure
-
-```bash
-mkdir mediscan
-cd mediscan
-
-mkdir app frontend models data notebooks
-mkdir app/model app/llm app/utils frontend/assets frontend/utils
-touch README.md requirements.txt .gitignore
-```
-
-### 2. Initialize Git Repository
-
-```bash
-git init
-```
-
-Sample `.gitignore`:
-
-```txt
-__pycache__/
-*.pyc
-*.pkl
-*.pth
-.env
-models/
-data/
-```
-
-### 3. Create a Python Virtual Environment
-
-```bash
-python -m venv venv
-# On Unix/macOS:
-source venv/bin/activate
-# On Windows:
-venv\Scripts\activate
-```
-
-### 4. Install Core Dependencies
-
-```bash
-pip install torch torchvision timm transformers fastapi uvicorn streamlit gradio pillow numpy captum
-```
-
-Add to `requirements.txt`:
-
-```txt
-torch
-torchvision
-timm
-transformers
-fastapi
-uvicorn
-streamlit
-gradio
-pillow
-numpy
-captum
-```
-
-### 5. (Optional) Create Initial Placeholder Files
-
-```bash
-touch app/main.py
-touch frontend/app.py
-```
+- **Disease Classification:** Predicts NORMAL or PNEUMONIA from chest X-ray images.
+- **Explainable AI:** Returns detailed, radiology-style observations for each prediction.
+- **REST API:** FastAPI backend for easy integration.
+- **Frontend:** React-based UI for image upload and result display.
+- **Easy Deployment:** Run locally with minimal setup.
 
 ---
 
-## Folder Structure
+## 📂 Project Structure
 
 ```
 mediscan/
-├── README.md
+├── app/                # FastAPI backend
+│   ├── main.py
+│   └── model/
+│       ├── vit_classifier.py
+│       ├── fine_tune.py
+│       └── fine_tuned_model/
+│           ├── config.json
+│           ├── preprocessor_config.json
+│           └── pytorch_model.bin
+├── frontend/           # React frontend
+│   ├── src/
+│   │   ├── App.js
+│   │   ├── ImageUpload.js
+│   │   └── index.js
+│   └── public/
+├── data/               # Data (not included in repo)
+│   └── chest_xray/
+│       ├── train/
+│       ├── val/
+│       └── test/
+├── notebooks/          # Jupyter/Colab notebooks
+│   └── finetune_vit_chestxray_colab.ipynb
 ├── requirements.txt
-├── .gitignore
-├── app/
-│   ├── model/
-│   ├── llm/
-│   └── utils/
-├── frontend/
-│   ├── assets/
-│   └── utils/
-├── models/
-├── data/
-└── notebooks/
+├── README.md
+└── .gitignore
 ```
-
-## Quick Start
-
-1. Clone the repo and install requirements.
-2. Train or download the ViT model weights.
-3. Run the FastAPI backend and Streamlit frontend.
-4. Upload a chest X-ray and view predictions, heatmaps, and reports.
 
 ---
 
-## 🏃‍♂️ How to Run the Project with Your Fine-Tuned Model
+## 📊 Dataset
 
-### 1. Place Your Fine-Tuned Model
+- **Source:** [Chest X-Ray Images (Pneumonia) | Kaggle](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia)
+- **Structure:**
+  - `train/` - Training images (NORMAL, PNEUMONIA)
+  - `val/` - Validation images (NORMAL, PNEUMONIA)
+  - `test/` - Test images (NORMAL, PNEUMONIA)
 
-- After training, copy the `fine_tuned_model` folder (containing `pytorch_model.bin`, `config.json`, etc.) into `mediscan/app/model/fine_tuned_model`.
+**Note:**  
+Download the dataset from Kaggle and place it in `mediscan/data/chest_xray/`.
 
-### 2. Update Model Loading Code
+---
 
-- In your FastAPI backend (e.g., `app/model/vit_classifier.py`), change:
-  ```python
-  model_name = "app/model/fine_tuned_model"
-  processor = AutoImageProcessor.from_pretrained(model_name)
-  model = AutoModelForImageClassification.from_pretrained(model_name)
-  ```
-- This ensures the backend uses your fine-tuned weights.
+## 🛠️ Setup & Installation
 
-### 3. Start the Backend API
+### 1. Clone the Repository
 
 ```bash
+git clone https://github.com/yourusername/mediscan.git
 cd mediscan
+```
+
+### 2. Install Python Dependencies
+
+```bash
+python -m venv venv
+# Activate the virtual environment:
+# On Windows:
+venv\Scripts\activate
+# On Unix/macOS:
+source venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+### 3. Prepare the Dataset
+
+- Download from [Kaggle](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia).
+- Place the folders as:
+  ```
+  mediscan/data/chest_xray/train/
+  mediscan/data/chest_xray/val/
+  mediscan/data/chest_xray/test/
+  ```
+
+### 4. (Optional) Fine-tune the Model
+
+- Use the provided notebook:  
+  [`notebooks/finetune_vit_chestxray_colab.ipynb`](../notebooks/finetune_vit_chestxray_colab.ipynb)
+- Or run the script:  
+  `python app/model/fine_tune.py`
+- Save the resulting model files in `app/model/fine_tuned_model/`.
+
+### 5. Start the Backend API
+
+```bash
 uvicorn app.main:app --reload
 ```
-- The API will be available at `http://127.0.0.1:8000`.
+- The API will be available at [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
-### 4. Test the API
+### 6. (Optional) Start the Frontend
 
-- Use the provided Python script in `frontend/app.py` or the `/docs` Swagger UI to upload an image and get a prediction.
+- Navigate to `frontend/` and run:
+  ```bash
+  npm install
+  npm start
+  ```
+- Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-```bash
-python frontend/app.py
+---
+
+## 🧪 Usage
+
+### Predict via API
+
+Send a POST request to `/predict` with an X-ray image:
+
+```python
+import requests
+
+with open("path_to_image.jpeg", "rb") as f:
+    response = requests.post("http://127.0.0.1:8000/predict", files={"file": f})
+print(response.json())
 ```
 
-### 5. (Optional) Run the React Frontend
+**Response Example:**
+```json
+{
+  "prediction": "PNEUMONIA",
+  "confidence": 0.95,
+  "explanation": "The model detected the following observations in the X-ray image: ..."
+}
+```
 
-- Use the provided React component (`ImageUpload.js`) in your frontend React app to upload images and display predictions.
+### Predict via Frontend
 
----
-
-## 🧪 Testing the Backend and Frontend
-
-### Test the FastAPI Backend
-
-1. **Start the backend:**
-   ```bash
-   cd mediscan
-   uvicorn app.main:app --reload
-   ```
-2. **Test with Swagger UI:**
-   - Open [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) in your browser.
-   - Use the `/predict` endpoint to upload an image and see the prediction.
-
-3. **Test with Python script:**
-   - Run the provided script:
-     ```bash
-     python frontend/app.py
-     ```
-   - This will upload a test image and print the prediction.
+- Open the React app in your browser.
+- Upload a chest X-ray image.
+- View the prediction and detailed observations.
 
 ---
 
-### Test the React Frontend
+## 📒 Notebooks
 
-1. **Add the `ImageUpload.js` component to your React app.**
-2. **Start your React app:**
-   ```bash
-   cd path/to/your/react/app
-   npm start
-   ```
-3. **Open the app in your browser.**
-   - Upload a chest X-ray image.
-   - The prediction will be displayed after upload.
+- [`finetune_vit_chestxray_colab.ipynb`](../notebooks/finetune_vit_chestxray_colab.ipynb):  
+  Step-by-step guide for fine-tuning ViT on the chest X-ray dataset.
 
 ---
 
-**Note:**  
-- Ensure the backend (`uvicorn`) is running before testing the frontend.
-- The backend and frontend can run simultaneously on different ports.
+## 📝 Model Details
+
+- **Architecture:** Vision Transformer (ViT)
+- **Pretrained Weights:** `google/vit-base-patch16-224`
+- **Fine-tuning:** Only the classification head is trained on the chest X-ray dataset.
+- **Classes:** NORMAL, PNEUMONIA
 
 ---
 
-**Note:**  
-- Make sure all dependencies are installed (`pip install -r requirements.txt`).
-- If you retrain or fine-tune again, repeat step 1 to update the model files.
+## 🔗 Useful Links
+
+- [Kaggle Chest X-ray Dataset](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia)
+- [Hugging Face Transformers](https://huggingface.co/docs/transformers/index)
+- [Vision Transformer Paper](https://arxiv.org/abs/2010.11929)
 
 ---
 
-**Disclaimer:** AI-aided results – not for clinical use.
+## ⚠️ Disclaimer
+
+This project is for research and educational purposes only.  
+**Not for clinical use.**
+
+---
+
+## 📧 Contact
+
+For questions or contributions, open an issue or pull request on [GitHub](https://github.com/yourusername/mediscan).
