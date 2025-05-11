@@ -7,3 +7,5 @@ models/
 data/
 venv/
 notebooks/chest-xray-pneumonia.zip
+frontend/node_modules/
+app/model/fine_tuned_model/model.safetensors

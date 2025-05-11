@@ -1,11 +1,32 @@
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
+from fastapi import FastAPI, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 from app.model.vit_classifier import predict_disease
+from PIL import Image
+import io
 
-# Replace with your test image path
-image_path = r"C:\Users\Tejas\OneDrive\Desktop\MedIntuit\mediscan\data\chest_xray\test\PNEUMONIA\person1_virus_6.jpeg"
-result = predict_disease(image_path)
+app = FastAPI()
 
-print("Prediction:", result)
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Or restrict to ["http://localhost:3000"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.post("/predict")
+async def predict(file: UploadFile = File(...)):
+    image = Image.open(io.BytesIO(await file.read())).convert("RGB")
+    temp_path = "temp_uploaded_image.jpg"
+    image.save(temp_path)
+    result = predict_disease(temp_path)
+    return {
+        "prediction": result["label"],
+        "confidence": result["confidence"],
+        "explanation": result["explanation"]
+    }
+
+@app.get("/")
+def read_root():
+    return {"message": "MediScan API is running. Use /predict to POST an image."}
