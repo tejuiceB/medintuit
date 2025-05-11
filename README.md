@@ -4,6 +4,12 @@ MediScan is a full-stack AI application for automated chest X-ray analysis. It l
 
 ---
 
+## 🖼️ Example Prediction
+
+![MediScan Prediction Example](https://github.com/tejuiceB/medintuit/raw/main/frontend/screenshots/image.png)
+
+---
+
 ## 🚀 Features
 
 - **Disease Classification:** Predicts NORMAL or PNEUMONIA from chest X-ray images.
